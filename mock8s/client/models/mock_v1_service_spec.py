@@ -5,43 +5,53 @@ import pprint
 
 class MockV1ServiceSpec(object):
     openapi_types = {
-        'cluster_ip': 'str',
-        'external_i_ps': 'list[str]',
-        'external_name': 'str',
-        'external_traffic_policy': 'str',
-        'health_check_node_port': 'int',
-        'load_balancer_ip': 'str',
-        'load_balancer_source_ranges': 'list[str]',
-        'ports': 'list[V1ServicePort]',
-        'publish_not_ready_addresses': 'bool',
-        'selector': 'dict(str, str)',
-        'session_affinity': 'str',
-        'session_affinity_config': 'V1SessionAffinityConfig',
-        'type': 'str'
+        "cluster_ip": "str",
+        "external_i_ps": "list[str]",
+        "external_name": "str",
+        "external_traffic_policy": "str",
+        "health_check_node_port": "int",
+        "load_balancer_ip": "str",
+        "load_balancer_source_ranges": "list[str]",
+        "ports": "list[V1ServicePort]",
+        "publish_not_ready_addresses": "bool",
+        "selector": "dict(str, str)",
+        "session_affinity": "str",
+        "session_affinity_config": "V1SessionAffinityConfig",
+        "type": "str",
     }
 
     attribute_map = {
-        'cluster_ip': 'clusterIP',
-        'external_i_ps': 'externalIPs',
-        'external_name': 'externalName',
-        'external_traffic_policy': 'externalTrafficPolicy',
-        'health_check_node_port': 'healthCheckNodePort',
-        'load_balancer_ip': 'loadBalancerIP',
-        'load_balancer_source_ranges': 'loadBalancerSourceRanges',
-        'ports': 'ports',
-        'publish_not_ready_addresses': 'publishNotReadyAddresses',
-        'selector': 'selector',
-        'session_affinity': 'sessionAffinity',
-        'session_affinity_config': 'sessionAffinityConfig',
-        'type': 'type'
+        "cluster_ip": "clusterIP",
+        "external_i_ps": "externalIPs",
+        "external_name": "externalName",
+        "external_traffic_policy": "externalTrafficPolicy",
+        "health_check_node_port": "healthCheckNodePort",
+        "load_balancer_ip": "loadBalancerIP",
+        "load_balancer_source_ranges": "loadBalancerSourceRanges",
+        "ports": "ports",
+        "publish_not_ready_addresses": "publishNotReadyAddresses",
+        "selector": "selector",
+        "session_affinity": "sessionAffinity",
+        "session_affinity_config": "sessionAffinityConfig",
+        "type": "type",
     }
 
-    def __init__(self, cluster_ip=None, external_i_ps=None, external_name=None,
-                 external_traffic_policy=None, health_check_node_port=None,
-                 load_balancer_ip=None, load_balancer_source_ranges=None,
-                 ports=None, publish_not_ready_addresses=None, selector=None,
-                 session_affinity=None, session_affinity_config=None,
-                 type=None):
+    def __init__(
+        self,
+        cluster_ip=None,
+        external_i_ps=None,
+        external_name=None,
+        external_traffic_policy=None,
+        health_check_node_port=None,
+        load_balancer_ip=None,
+        load_balancer_source_ranges=None,
+        ports=None,
+        publish_not_ready_addresses=None,
+        selector=None,
+        session_affinity=None,
+        session_affinity_config=None,
+        type=None,
+    ):
 
         self.cluster_ip = cluster_ip
         self._cluster_ip = self.cluster_ip
@@ -89,18 +99,23 @@ class MockV1ServiceSpec(object):
         for attr, _ in six.iteritems(self.openapi_types):
             value = getattr(self, attr)
             if isinstance(value, list):
-                result[attr] = list(map(
-                    lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
-                    value
-                ))
+                result[attr] = list(
+                    map(
+                        lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
+                        value,
+                    )
+                )
             elif hasattr(value, "to_dict"):
                 result[attr] = value.to_dict()
             elif isinstance(value, dict):
-                result[attr] = dict(map(
-                    lambda item: (item[0], item[1].to_dict())
-                    if hasattr(item[1], "to_dict") else item,
-                    value.items()
-                ))
+                result[attr] = dict(
+                    map(
+                        lambda item: (item[0], item[1].to_dict())
+                        if hasattr(item[1], "to_dict")
+                        else item,
+                        value.items(),
+                    )
+                )
             else:
                 result[attr] = value
 

@@ -1,17 +1,13 @@
-#from kubernetes.client.models.v1_load_balancer_status import V1LoadBalancerStatus
+# from kubernetes.client.models.v1_load_balancer_status import V1LoadBalancerStatus  # noqa
 import pprint
 import six
 
 
 class MockV1LoadBalancerStatus:
 
-    openapi_types = {
-        'ingress': 'list[V1LoadBalancerIngress]'
-    }
+    openapi_types = {"ingress": "list[V1LoadBalancerIngress]"}
 
-    attribute_map = {
-        'ingress': 'ingress'
-    }
+    attribute_map = {"ingress": "ingress"}
 
     def __init__(self, ingress=None):  # noqa: E501
         self._ingress = None
@@ -27,18 +23,23 @@ class MockV1LoadBalancerStatus:
         for attr, _ in six.iteritems(self.openapi_types):
             value = getattr(self, attr)
             if isinstance(value, list):
-                result[attr] = list(map(
-                    lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
-                    value
-                ))
+                result[attr] = list(
+                    map(
+                        lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
+                        value,
+                    )
+                )
             elif hasattr(value, "to_dict"):
                 result[attr] = value.to_dict()
             elif isinstance(value, dict):
-                result[attr] = dict(map(
-                    lambda item: (item[0], item[1].to_dict())
-                    if hasattr(item[1], "to_dict") else item,
-                    value.items()
-                ))
+                result[attr] = dict(
+                    map(
+                        lambda item: (item[0], item[1].to_dict())
+                        if hasattr(item[1], "to_dict")
+                        else item,
+                        value.items(),
+                    )
+                )
             else:
                 result[attr] = value
 
@@ -54,7 +55,7 @@ class MockV1LoadBalancerStatus:
 
     def __eq__(self, other):
         """Returns true if both objects are equal"""
-        if not isinstance(other, V1LoadBalancerStatus):
+        if not isinstance(other, MockV1LoadBalancerStatus):
             return False
 
         return self.__dict__ == other.__dict__

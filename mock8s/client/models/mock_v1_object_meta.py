@@ -5,32 +5,45 @@ import pprint
 
 class MockV1ObjectMeta:
     openapi_types = {
-        'annotations': 'dict(str, str)',
-        'cluster_name': 'str',
-        'creation_timestamp': 'datetime',
-        'deletion_grace_period_seconds': 'int',
-        'deletion_timestamp': 'datetime',
-        'finalizers': 'list[str]',
-        'generate_name': 'str',
-        'generation': 'int',
-        'initializers': 'V1Initializers',
-        'labels': 'dict(str, str)',
-        'managed_fields': 'list[V1ManagedFieldsEntry]',
-        'name': 'str',
-        'namespace': 'str',
-        'owner_references': 'list[V1OwnerReference]',
-        'resource_version': 'str',
-        'self_link': 'str',
-        'uid': 'str'
+        "annotations": "dict(str, str)",
+        "cluster_name": "str",
+        "creation_timestamp": "datetime",
+        "deletion_grace_period_seconds": "int",
+        "deletion_timestamp": "datetime",
+        "finalizers": "list[str]",
+        "generate_name": "str",
+        "generation": "int",
+        "initializers": "V1Initializers",
+        "labels": "dict(str, str)",
+        "managed_fields": "list[V1ManagedFieldsEntry]",
+        "name": "str",
+        "namespace": "str",
+        "owner_references": "list[V1OwnerReference]",
+        "resource_version": "str",
+        "self_link": "str",
+        "uid": "str",
     }
 
-    def __init__(self, annotations=None, cluster_name=None,
-                 creation_timestamp=None, deletion_grace_period_seconds=None,
-                 deletion_timestamp=None, finalizers=None, generate_name=None,
-                 generation=None, initializers=None, labels=None,
-                 managed_fields=None, name=None, namespace=None,
-                 owner_references=None, resource_version=None, self_link=None,
-                 uid=None):
+    def __init__(
+        self,
+        annotations=None,
+        cluster_name=None,
+        creation_timestamp=None,
+        deletion_grace_period_seconds=None,
+        deletion_timestamp=None,
+        finalizers=None,
+        generate_name=None,
+        generation=None,
+        initializers=None,
+        labels=None,
+        managed_fields=None,
+        name=None,
+        namespace=None,
+        owner_references=None,
+        resource_version=None,
+        self_link=None,
+        uid=None,
+    ):
         self.annotations = annotations
         self._annotations = self.annotations
 
@@ -41,8 +54,9 @@ class MockV1ObjectMeta:
         self._creation_timestamp = self.creation_timestamp
 
         self.deletion_grace_period_seconds = deletion_grace_period_seconds
-        self._deletion_grace_period_seconds = \
+        self._deletion_grace_period_seconds = (
             self.deletion_grace_period_seconds
+        )
 
         self.deletion_timestamp = deletion_timestamp
         self._deletion_timestamp = self.deletion_timestamp
@@ -90,18 +104,23 @@ class MockV1ObjectMeta:
         for attr, _ in six.iteritems(self.openapi_types):
             value = getattr(self, attr)
             if isinstance(value, list):
-                result[attr] = list(map(
-                    lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
-                    value
-                ))
+                result[attr] = list(
+                    map(
+                        lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
+                        value,
+                    )
+                )
             elif hasattr(value, "to_dict"):
                 result[attr] = value.to_dict()
             elif isinstance(value, dict):
-                result[attr] = dict(map(
-                    lambda item: (item[0], item[1].to_dict())
-                    if hasattr(item[1], "to_dict") else item,
-                    value.items()
-                ))
+                result[attr] = dict(
+                    map(
+                        lambda item: (item[0], item[1].to_dict())
+                        if hasattr(item[1], "to_dict")
+                        else item,
+                        value.items(),
+                    )
+                )
             else:
                 result[attr] = value
 
