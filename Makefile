@@ -7,5 +7,8 @@ lint:
 	flake8 mock8s/
 	black --line-length 79 --check mock8s/
 
-test: lint
+unit:
+	pytest tests/
+
+test: lint unit
 

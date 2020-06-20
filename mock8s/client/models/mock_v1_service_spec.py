@@ -1,4 +1,5 @@
-from kubernetes.client.models.v1_service_spec import V1ServiceSpec
+# from kubernetes.client.models.v1_service_spec import V1ServiceSpec
+from mock8s.config import MOCK_CLUSTER_IP
 import six
 import pprint
 
@@ -53,7 +54,7 @@ class MockV1ServiceSpec(object):
         type=None,
     ):
 
-        self.cluster_ip = cluster_ip
+        self.cluster_ip = cluster_ip if cluster_ip else MOCK_CLUSTER_IP
         self._cluster_ip = self.cluster_ip
 
         self.external_i_ps = external_i_ps
@@ -131,7 +132,7 @@ class MockV1ServiceSpec(object):
 
     def __eq__(self, other):
         """Returns true if both objects are equal"""
-        if not isinstance(other, V1ServiceSpec):
+        if not isinstance(other, MockV1ServiceSpec):
             return False
 
         return self.__dict__ == other.__dict__
