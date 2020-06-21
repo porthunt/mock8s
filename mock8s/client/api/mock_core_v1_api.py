@@ -24,20 +24,27 @@ class MockCoreV1Api:
                 for key, value in service.metadata.labels.items()
             ]
             for label in labels:
-                if label_selector in label:
+                if label_selector.startswith(label):
                     return True
 
         return False
 
     def __field_in_service(self, service, field_selector):
-        if service.spec.selector:
-            selectors = [
-                "{}={}".format(key, value)
-                for key, value in service.spec.selector.items()
-            ]
-            for selector in selectors:
-                if field_selector in selector:
-                    return True
+        if not field_selector:
+            return False
+
+        if not field_selector.startswith("metadata.name") and \
+                not field_selector.startswith("metadata.namespace"):
+            raise ApiException(400, "Bad Request")
+
+        selector_name = "metadata.name={}".format(service.metadata.name)
+        selector_namespace = "metadata.namespace={}".format(
+            service.metadata.namespace
+        )
+
+        if field_selector == selector_name or \
+                field_selector == selector_namespace:
+            return True
 
         return False
 

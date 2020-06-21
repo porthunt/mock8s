@@ -45,6 +45,19 @@ def test_list_service_for_all_namespaces_label_selector(service_yaml):
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
+    filtered = v1.list_service_for_all_namespaces(label_selector="group=abc")
+    assert len(filtered.items) == 1
+
+
+@mock8s
+def test_list_service_for_all_namespaces_label_selector_not_found(
+        service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+    v1.create_namespaced_service("default", body=body)
+    assert len(v1.list_service_for_all_namespaces().items) == 1
     filtered = v1.list_service_for_all_namespaces(label_selector="xxx")
     assert len(filtered.items) == 0
 
@@ -57,7 +70,8 @@ def test_list_service_for_all_namespaces_field_selector(service_yaml):
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
-    filtered = v1.list_service_for_all_namespaces(field_selector="barbaz")
+    filtered = v1.list_service_for_all_namespaces(
+        field_selector="metadata.name=foobar")
     assert len(filtered.items) == 1
 
 
@@ -70,7 +84,7 @@ def test_list_service_for_all_namespaces_label_field_selector(service_yaml):
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
     filtered = v1.list_service_for_all_namespaces(
-        label_selector="group=abc", field_selector="barbaz"
+        label_selector="group=abc", field_selector="metadata.name=foobar"
     )
     assert len(filtered.items) == 1
 
@@ -102,7 +116,7 @@ def test_list_service_for_all_namespaces_correct_label_bad_selector(
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
     filtered = v1.list_service_for_all_namespaces(
-        label_selector="group=abc", field_selector="xxx"
+        label_selector="group=abc", field_selector="metadata.name=barbaz"
     )
     assert len(filtered.items) == 0
 
@@ -225,7 +239,8 @@ def test_list_namespaced_service_label_field_selector(service_yaml):
     v1.create_namespaced_service("default", body=body)
     servs = v1.list_namespaced_service("default")
     servs_filter = v1.list_namespaced_service(
-        "default", label_selector="abc", field_selector="barbaz"
+        "default", label_selector="group=abc",
+        field_selector="metadata.namespace=default"
     )
     assert len(servs.items) == 1
     assert len(servs_filter.items) == 1
@@ -241,7 +256,7 @@ def test_list_namespaced_service_bad_label_correct_field_selector(
     v1.create_namespaced_service("default", body=body)
     servs = v1.list_namespaced_service("default")
     servs_filter = v1.list_namespaced_service(
-        "default", label_selector="xxx", field_selector="barbaz"
+        "default", label_selector="xxx", field_selector="metadata.name=foobar"
     )
     assert len(servs.items) == 1
     assert len(servs_filter.items) == 0
@@ -255,12 +270,12 @@ def test_list_namespaced_service_correct_label_bad_field_selector(
     v1 = client.CoreV1Api()
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
     v1.create_namespaced_service("default", body=body)
-    servs = v1.list_namespaced_service("default")
-    servs_filter = v1.list_namespaced_service(
-        "default", label_selector="abc", field_selector="xxx"
-    )
-    assert len(servs.items) == 1
-    assert len(servs_filter.items) == 0
+    with pytest.raises(ApiException) as err:
+        v1.list_namespaced_service("default",
+                                   label_selector="group=abc",
+                                   field_selector="xxx")
+    assert err.value.status == 400
+    assert err.value.reason == "Bad Request"
 
 
 @mock8s
@@ -271,7 +286,7 @@ def test_list_namespaced_service_field_selector(service_yaml):
     v1.create_namespaced_service("default", body=body)
     servs = v1.list_namespaced_service("default")
     servs_filter = v1.list_namespaced_service(
-        "default", field_selector="barbaz"
+        "default", field_selector="metadata.name=foobar"
     )
     assert len(servs.items) == 1
     assert len(servs_filter.items) == 1
