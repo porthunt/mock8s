@@ -6,14 +6,6 @@ Easily mock tests from kubernetes-client
 ### CoreV1Api
 |method|supported?|
 |---|---|
-# mock8s
-Easily mock tests from kubernetes-client
-
-## Support
-
-### CoreV1Api
-|method|supported?|
-|---|---|
 |`connect_delete_namespaced_pod_proxy`|:x:|
 |`connect_delete_namespaced_pod_proxy_with_path`|:x:|
 |`connect_delete_namespaced_service_proxy`|:x:|
