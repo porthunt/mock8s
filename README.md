@@ -204,4 +204,4 @@ Easily mock tests from kubernetes-client
 |`replace_node`|:x:|
 |`replace_node_status`|:x:|
 |`replace_persistent_volume`|:x:|
-|`replace_persistent_volume_status|:x:|
+|`replace_persistent_volume_status`|:x:|
