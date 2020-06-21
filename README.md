@@ -68,7 +68,7 @@ Easily mock tests from kubernetes-client
 |`create_namespaced_replication_controller`|:x:|
 |`create_namespaced_resource_quota`|:x:|
 |`create_namespaced_secret`|:x:|
-|`create_namespaced_service`|:heavy_check_mark:|
+|`create_namespaced_service`|:white_check_mark:|
 |`create_namespaced_service_account`|:x:|
 |`create_namespaced_service_account_token`|:x:|
 |`create_node`|:x:|
@@ -97,7 +97,7 @@ Easily mock tests from kubernetes-client
 |`delete_namespaced_replication_controller`|:x:|
 |`delete_namespaced_resource_quota`|:x:|
 |`delete_namespaced_secret`|:x:|
-|`delete_namespaced_service`|:heavy_check_mark:|
+|`delete_namespaced_service`|:white_check_mark:|
 |`delete_namespaced_service_account`|:x:|
 |`delete_node`|:x:|
 |`delete_persistent_volume`|:x:|
@@ -118,7 +118,7 @@ Easily mock tests from kubernetes-client
 |`list_namespaced_replication_controller`|:x:|
 |`list_namespaced_resource_quota`|:x:|
 |`list_namespaced_secret`|:x:|
-|`list_namespaced_service`|:heavy_check_mark:|
+|`list_namespaced_service`|:white_check_mark:|
 |`list_namespaced_service_account`|:x:|
 |`list_node`|:x:|
 |`list_persistent_volume`|:x:|
@@ -129,7 +129,7 @@ Easily mock tests from kubernetes-client
 |`list_resource_quota_for_all_namespaces`|:x:|
 |`list_secret_for_all_namespaces`|:x:|
 |`list_service_account_for_all_namespaces`|:x:|
-|`list_service_for_all_namespaces`|:heavy_check_mark:|
+|`list_service_for_all_namespaces`|:white_check_mark:|
 |`patch_namespace`|:x:|
 |`patch_namespace_status`|:x:|
 |`patch_namespaced_config_map`|:x:|
@@ -147,7 +147,7 @@ Easily mock tests from kubernetes-client
 |`patch_namespaced_resource_quota`|:x:|
 |`patch_namespaced_resource_quota_status`|:x:|
 |`patch_namespaced_secret`|:x:|
-|`patch_namespaced_service`|:heavy_check_mark:|
+|`patch_namespaced_service`|:white_check_mark:|
 |`patch_namespaced_service_account`|:x:|
 |`patch_namespaced_service_status`|:x:|
 |`patch_node`|:x:|
@@ -198,7 +198,7 @@ Easily mock tests from kubernetes-client
 |`replace_namespaced_resource_quota`|:x:|
 |`replace_namespaced_resource_quota_status`|:x:|
 |`replace_namespaced_secret`|:x:|
-|`replace_namespaced_service`|:heavy_check_mark:|
+|`replace_namespaced_service`|:white_check_mark:|
 |`replace_namespaced_service_account`|:x:|
 |`replace_namespaced_service_status`|:x:|
 |`replace_node`|:x:|
