@@ -7,4 +7,4 @@ black
 kubernetes
 pytest
 mock
-
+uuid

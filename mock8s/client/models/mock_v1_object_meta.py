@@ -1,6 +1,7 @@
 # from kubernetes.client.models.v1_object_meta import V1ObjectMeta
 import six
 import pprint
+import uuid
 
 
 class MockV1ObjectMeta:
@@ -94,7 +95,10 @@ class MockV1ObjectMeta:
         self.self_link = self_link
         self._self_link = self.self_link
 
-        self.uid = uid
+        if uid:
+            self.uid = uid
+        else:
+            self.uid = str(uuid.uuid4())
         self._uid = self.uid
 
     def to_dict(self):
