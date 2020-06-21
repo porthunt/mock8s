@@ -28,7 +28,94 @@ def service_yaml():
 
 
 @mock8s
-def test_create_service(service_yaml):
+def test_list_service_for_all_namespaces(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+    v1.create_namespaced_service("default", body=body)
+    assert len(v1.list_service_for_all_namespaces().items) == 1
+
+
+@mock8s
+def test_list_service_for_all_namespaces_label_selector(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+    v1.create_namespaced_service("default", body=body)
+    assert len(v1.list_service_for_all_namespaces().items) == 1
+    filtered = v1.list_service_for_all_namespaces(label_selector="xxx")
+    assert len(filtered.items) == 0
+
+
+@mock8s
+def test_list_service_for_all_namespaces_field_selector(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+    v1.create_namespaced_service("default", body=body)
+    assert len(v1.list_service_for_all_namespaces().items) == 1
+    filtered = v1.list_service_for_all_namespaces(field_selector="barbaz")
+    assert len(filtered.items) == 1
+
+
+@mock8s
+def test_list_service_for_all_namespaces_label_field_selector(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+    v1.create_namespaced_service("default", body=body)
+    assert len(v1.list_service_for_all_namespaces().items) == 1
+    filtered = v1.list_service_for_all_namespaces(
+        label_selector="group=abc", field_selector="barbaz"
+    )
+    assert len(filtered.items) == 1
+
+
+@mock8s
+def test_list_service_for_all_namespaces_bad_label_correct_selector(
+    service_yaml,
+):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+    v1.create_namespaced_service("default", body=body)
+    assert len(v1.list_service_for_all_namespaces().items) == 1
+    filtered = v1.list_service_for_all_namespaces(
+        label_selector="group=def", field_selector="barbaz"
+    )
+    assert len(filtered.items) == 0
+
+
+@mock8s
+def test_list_service_for_all_namespaces_correct_label_bad_selector(
+    service_yaml,
+):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+    v1.create_namespaced_service("default", body=body)
+    assert len(v1.list_service_for_all_namespaces().items) == 1
+    filtered = v1.list_service_for_all_namespaces(
+        label_selector="group=abc", field_selector="xxx"
+    )
+    assert len(filtered.items) == 0
+
+
+@mock8s
+def test_list_service_for_all_namespaces_empty():
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    assert len(v1.list_service_for_all_namespaces().items) == 0
+
+
+@mock8s
+def test_create_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
@@ -51,7 +138,7 @@ def test_create_service(service_yaml):
 
 
 @mock8s
-def test_create_service_wrong_kind(service_yaml):
+def test_create_namespaced_service_wrong_kind(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     service_yaml = service_yaml.replace("kind: Service", "kind: Servii")
@@ -63,7 +150,7 @@ def test_create_service_wrong_kind(service_yaml):
 
 
 @mock8s
-def test_create_service_wrong_namespace_doesnt_exist(service_yaml):
+def test_create_namespaced_service_wrong_namespace_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
@@ -74,7 +161,7 @@ def test_create_service_wrong_namespace_doesnt_exist(service_yaml):
 
 
 @mock8s
-def test_delete_service(service_yaml):
+def test_delete_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
@@ -85,7 +172,7 @@ def test_delete_service(service_yaml):
 
 
 @mock8s
-def test_delete_service_name_doesnt_exist(service_yaml):
+def test_delete_namespaced_service_name_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
@@ -97,7 +184,7 @@ def test_delete_service_name_doesnt_exist(service_yaml):
 
 
 @mock8s
-def test_delete_service_namespace_doesnt_exist(service_yaml):
+def test_delete_namespaced_service_namespace_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
@@ -109,7 +196,7 @@ def test_delete_service_namespace_doesnt_exist(service_yaml):
 
 
 @mock8s
-def test_list_services_on_namespace(service_yaml):
+def test_list_namespaced_service_on_namespace(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
@@ -119,7 +206,79 @@ def test_list_services_on_namespace(service_yaml):
 
 
 @mock8s
-def test_list_services_on_namespace_empty():
+def test_list_namespaced_service_label_selector(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    v1.create_namespaced_service("default", body=body)
+    servs = v1.list_namespaced_service("default")
+    servs_filter = v1.list_namespaced_service("default", label_selector="xxx")
+    assert len(servs.items) == 1
+    assert len(servs_filter.items) == 0
+
+
+@mock8s
+def test_list_namespaced_service_label_field_selector(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    v1.create_namespaced_service("default", body=body)
+    servs = v1.list_namespaced_service("default")
+    servs_filter = v1.list_namespaced_service(
+        "default", label_selector="abc", field_selector="barbaz"
+    )
+    assert len(servs.items) == 1
+    assert len(servs_filter.items) == 1
+
+
+@mock8s
+def test_list_namespaced_service_bad_label_correct_field_selector(
+    service_yaml,
+):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    v1.create_namespaced_service("default", body=body)
+    servs = v1.list_namespaced_service("default")
+    servs_filter = v1.list_namespaced_service(
+        "default", label_selector="xxx", field_selector="barbaz"
+    )
+    assert len(servs.items) == 1
+    assert len(servs_filter.items) == 0
+
+
+@mock8s
+def test_list_namespaced_service_correct_label_bad_field_selector(
+    service_yaml,
+):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    v1.create_namespaced_service("default", body=body)
+    servs = v1.list_namespaced_service("default")
+    servs_filter = v1.list_namespaced_service(
+        "default", label_selector="abc", field_selector="xxx"
+    )
+    assert len(servs.items) == 1
+    assert len(servs_filter.items) == 0
+
+
+@mock8s
+def test_list_namespaced_service_field_selector(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    v1.create_namespaced_service("default", body=body)
+    servs = v1.list_namespaced_service("default")
+    servs_filter = v1.list_namespaced_service(
+        "default", field_selector="barbaz"
+    )
+    assert len(servs.items) == 1
+    assert len(servs_filter.items) == 1
+
+
+@mock8s
+def test_list_namespaced_service_on_namespace_empty():
     config.load_kube_config()
     v1 = client.CoreV1Api()
     services = v1.list_namespaced_service("default")
@@ -127,7 +286,7 @@ def test_list_services_on_namespace_empty():
 
 
 @mock8s
-def test_list_services_on_namespace_namespace_doesnt_exist():
+def test_list_namespaced_service_namespace_doesnt_exist():
     config.load_kube_config()
     v1 = client.CoreV1Api()
     with pytest.raises(ApiException) as err:
@@ -178,14 +337,14 @@ def test_read_namespaced_service_namespace_doesnt_exist(service_yaml):
 def test_replace_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    new_service_yaml = service_yaml.replace('"group": "abc"',
-                                            '"group": "def"')
+    new_service_yaml = service_yaml.replace('"group": "abc"', '"group": "def"')
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
     new_body = yaml.load(new_service_yaml, Loader=yaml.FullLoader)
     new_service = v1.create_namespaced_service("default", body=body)
     assert new_service.metadata.labels == {"group": "abc"}
-    replaced_service = v1.replace_namespaced_service("foobar", "default",
-                                                     new_body)
+    replaced_service = v1.replace_namespaced_service(
+        "foobar", "default", new_body
+    )
     assert new_service != replaced_service
     assert replaced_service.metadata.labels == {"group": "def"}
 
@@ -234,14 +393,14 @@ def test_replace_namespaced_service_invalid_body(service_yaml):
 def test_patch_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    new_service_yaml = service_yaml.replace('"group": "abc"',
-                                            '"group": "def"')
+    new_service_yaml = service_yaml.replace('"group": "abc"', '"group": "def"')
     body = yaml.load(service_yaml, Loader=yaml.FullLoader)
     new_body = yaml.load(new_service_yaml, Loader=yaml.FullLoader)
     new_service = v1.create_namespaced_service("default", body=body)
     assert new_service.metadata.labels == {"group": "abc"}
-    replaced_service = v1.patch_namespaced_service("foobar", "default",
-                                                   new_body)
+    replaced_service = v1.patch_namespaced_service(
+        "foobar", "default", new_body
+    )
     assert new_service == replaced_service
     assert replaced_service.metadata.labels == {"group": "def"}
 

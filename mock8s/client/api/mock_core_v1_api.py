@@ -29,16 +29,39 @@ class MockCoreV1Api:
 
         return False
 
+    def __field_in_service(self, service, field_selector):
+        if service.spec.selector:
+            selectors = [
+                "{}={}".format(key, value)
+                for key, value in service.spec.selector.items()
+            ]
+            for selector in selectors:
+                if field_selector in selector:
+                    return True
+
+        return False
+
     def list_service_for_all_namespaces(self, **kwargs):
         label_selector = kwargs.get("label_selector")
+        field_selector = kwargs.get("field_selector")
 
-        if label_selector:
-            services = []
-            for service in self._services_items:
-                if self.__label_in_service(service, label_selector):
-                    services.append(service)
-        else:
+        services = []
+
+        if not label_selector and not field_selector:
             services = self._services_items
+        else:
+            for service in self._services_items:
+                if label_selector and field_selector:
+                    if self.__label_in_service(
+                        service, label_selector
+                    ) and self.__field_in_service(service, field_selector):
+                        services.append(service)
+                elif label_selector:
+                    if self.__label_in_service(service, label_selector):
+                        services.append(service)
+                elif field_selector:
+                    if self.__field_in_service(service, field_selector):
+                        services.append(service)
 
         return MockV1ServiceList(items=services)
 
@@ -76,9 +99,28 @@ class MockCoreV1Api:
         if namespace not in self._namespaced_services_items:
             raise ApiException(404, "Not Found")
 
-        return MockV1ServiceList(
-            items=self._namespaced_services_items[namespace]
-        )
+        label_selector = kwargs.get("label_selector")
+        field_selector = kwargs.get("field_selector")
+
+        services = []
+
+        if not label_selector and not field_selector:
+            services = self._namespaced_services_items[namespace]
+        else:
+            for service in self._namespaced_services_items[namespace]:
+                if label_selector and field_selector:
+                    if self.__label_in_service(
+                        service, label_selector
+                    ) and self.__field_in_service(service, field_selector):
+                        services.append(service)
+                elif label_selector:
+                    if self.__label_in_service(service, label_selector):
+                        services.append(service)
+                elif field_selector:
+                    if self.__field_in_service(service, field_selector):
+                        services.append(service)
+
+        return MockV1ServiceList(items=services)
 
     def read_namespaced_service(self, name, namespace, **kwargs):
         if namespace not in self._namespaced_services_items:
