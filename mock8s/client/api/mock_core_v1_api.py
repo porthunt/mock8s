@@ -1,5 +1,6 @@
 from kubernetes.client.api import CoreV1Api
 from mock8s.client.models.mock_v1_service_list import MockV1ServiceList
+from mock8s.client.models.mock_v1_pod_list import MockV1PodList
 from mock8s.client.models.mock_v1_api_service import MockV1APIService
 from mock8s.client.models.mock_v1_object_meta import MockV1ObjectMeta
 from mock8s.client.models.mock_v1_service_status import MockV1ServiceStatus
@@ -15,13 +16,16 @@ class MockCoreV1Api:
         self.api_client = api_client
 
         self._namespaced_services_items = {"default": set()}
+        self._namespaced_pods_items = {"default": set()}
         self._services_items = set()
+        self._pods_items = set()
 
-    def __label_in_service(self, service, label_selector):
-        if service.metadata.labels:
+    @staticmethod
+    def __label_in_resource(resource, label_selector):
+        if resource.metadata.labels:
             labels = [
                 "{}={}".format(key, value)
-                for key, value in service.metadata.labels.items()
+                for key, value in resource.metadata.labels.items()
             ]
             for label in labels:
                 if label_selector.startswith(label):
@@ -29,7 +33,8 @@ class MockCoreV1Api:
 
         return False
 
-    def __field_in_service(self, service, field_selector):
+    @staticmethod
+    def __field_in_resource(resource, field_selector):
         if not field_selector:
             return False
 
@@ -37,9 +42,9 @@ class MockCoreV1Api:
                 not field_selector.startswith("metadata.namespace"):
             raise ApiException(400, "Bad Request")
 
-        selector_name = "metadata.name={}".format(service.metadata.name)
+        selector_name = "metadata.name={}".format(resource.metadata.name)
         selector_namespace = "metadata.namespace={}".format(
-            service.metadata.namespace
+            resource.metadata.namespace
         )
 
         if field_selector == selector_name or \
@@ -59,20 +64,22 @@ class MockCoreV1Api:
         else:
             for service in self._services_items:
                 if label_selector and field_selector:
-                    if self.__label_in_service(
+                    if self.__label_in_resource(
                         service, label_selector
-                    ) and self.__field_in_service(service, field_selector):
+                    ) and self.__field_in_resource(service, field_selector):
                         services.append(service)
                 elif label_selector:
-                    if self.__label_in_service(service, label_selector):
+                    if self.__label_in_resource(service, label_selector):
                         services.append(service)
                 elif field_selector:
-                    if self.__field_in_service(service, field_selector):
+                    if self.__field_in_resource(service, field_selector):
                         services.append(service)
 
         return MockV1ServiceList(items=services)
 
-    def create_namespaced_service(self, namespace, body, **kwargs):
+    # SERVICES
+
+    def create_namespaced_service(self, namespace, body, **kwargs):  # noqa
         _metadata = body.get("metadata")
         _metadata["namespace"] = namespace
         service = MockV1APIService(
@@ -90,15 +97,13 @@ class MockCoreV1Api:
         self._namespaced_services_items[namespace].add(service)
         return service
 
-    def delete_namespaced_service(self, name, namespace, **kwargs):
-        if namespace not in self._namespaced_services_items.keys():
+    def read_namespaced_service(self, name, namespace, **kwargs):  # noqa
+        if namespace not in self._namespaced_services_items:
             raise ApiException(404, "Not Found")
 
-        for service in self._services_items:
+        for service in self._namespaced_services_items[namespace]:
             if service.metadata.name == name:
-                self._services_items.remove(service)
-                self._namespaced_services_items[namespace].remove(service)
-                break
+                return service
         else:
             raise ApiException(404, "Not Found")
 
@@ -116,30 +121,20 @@ class MockCoreV1Api:
         else:
             for service in self._namespaced_services_items[namespace]:
                 if label_selector and field_selector:
-                    if self.__label_in_service(
+                    if self.__label_in_resource(
                         service, label_selector
-                    ) and self.__field_in_service(service, field_selector):
+                    ) and self.__field_in_resource(service, field_selector):
                         services.append(service)
                 elif label_selector:
-                    if self.__label_in_service(service, label_selector):
+                    if self.__label_in_resource(service, label_selector):
                         services.append(service)
                 elif field_selector:
-                    if self.__field_in_service(service, field_selector):
+                    if self.__field_in_resource(service, field_selector):
                         services.append(service)
 
         return MockV1ServiceList(items=services)
 
-    def read_namespaced_service(self, name, namespace, **kwargs):
-        if namespace not in self._namespaced_services_items:
-            raise ApiException(404, "Not Found")
-
-        for service in self._namespaced_services_items[namespace]:
-            if service.metadata.name == name:
-                return service
-        else:
-            raise ApiException(404, "Not Found")
-
-    def patch_namespaced_service(self, name, namespace, body, **kwargs):
+    def patch_namespaced_service(self, name, namespace, body, **kwargs):  # noqa
         if namespace not in self._namespaced_services_items:
             raise ApiException(404, "Not Found")
 
@@ -164,7 +159,7 @@ class MockCoreV1Api:
         self._services_items.add(service)
         return service
 
-    def replace_namespaced_service(self, name, namespace, body, **kwargs):
+    def replace_namespaced_service(self, name, namespace, body, **kwargs):  # noqa
         if namespace not in self._namespaced_services_items:
             raise ApiException(404, "Not Found")
 
@@ -177,3 +172,80 @@ class MockCoreV1Api:
             raise ApiException(404, "Not Found")
 
         return self.create_namespaced_service(namespace, body)
+
+    def delete_namespaced_service(self, name, namespace, **kwargs):  # noqa
+        if namespace not in self._namespaced_services_items.keys():
+            raise ApiException(404, "Not Found")
+
+        for service in self._services_items:
+            if service.metadata.name == name:
+                self._services_items.remove(service)
+                self._namespaced_services_items[namespace].remove(service)
+                break
+        else:
+            raise ApiException(404, "Not Found")
+
+    # PODS
+
+    def create_namespaced_pod(self, namespace, body, **kwargs):
+        pass
+
+    def read_namespaced_pod(self, name, namespace, **kwargs):  # noqa
+        if namespace not in self._namespaced_services_items:
+            raise ApiException(404, "Not Found")
+
+        for pod in self._namespaced_pods_items[namespace]:
+            if pod.metadata.name == name:
+                return pod
+        else:
+            raise ApiException(404, "Not Found")
+
+    def list_namespaced_pod(self, namespace, **kwargs):
+        if namespace not in self._namespaced_pods_items:
+            raise ApiException(404, "Not Found")
+
+        label_selector = kwargs.get("label_selector")
+        field_selector = kwargs.get("field_selector")
+
+        pods = []
+
+        if not label_selector and not field_selector:
+            pods = self._namespaced_pods_items[namespace]
+        else:
+            for pod in self._namespaced_pods_items[namespace]:
+                if label_selector and field_selector:
+                    if self.__label_in_resource(
+                            pod, label_selector
+                    ) and self.__field_in_resource(pod, field_selector):
+                        pods.append(pod)
+                elif label_selector:
+                    if self.__label_in_resource(pod, label_selector):
+                        pods.append(pod)
+                elif field_selector:
+                    if self.__field_in_resource(pod, field_selector):
+                        pods.append(pod)
+
+        return MockV1PodList(items=pods)
+
+    def patch_namespaced_pod(self, name, namespace, body, **kwargs):
+        pass
+
+    def replace_namespaced_pod(self, name, namespace, body, **kwargs):
+        pass
+
+    def delete_namespaced_pod(self, name, namespace, **kwargs):  # noqa
+        if namespace not in self._namespaced_pods_items.keys():
+            raise ApiException(404, "Not Found")
+
+        for pod in self._pods_items:
+            if pod.metadata.name == name:
+                self._pods_items.remove(pod)
+                self._namespaced_pods_items[namespace].remove(pod)
+                break
+        else:
+            raise ApiException(404, "Not Found")
+
+    # POD LOGS
+
+    def read_namespaced_pod_log(self, name, namespace, **kwargs):
+        pass
