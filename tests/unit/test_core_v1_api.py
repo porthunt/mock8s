@@ -194,6 +194,19 @@ def test_create_namespaced_service(service_yaml):
 
 
 @mock8s
+def test_create_namespaced_service_already_exists(service_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
+    v1.create_namespaced_service("default", body=body)
+    with pytest.raises(ApiException) as err:
+        v1.create_namespaced_service("default", body=body)
+    assert err.value.status == 409
+    assert err.value.reason == "AlreadyExists"
+
+
+@mock8s
 def test_create_namespaced_service_wrong_kind(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
@@ -523,6 +536,19 @@ def test_create_namespaced_pod(pod_yaml):
 
 
 @mock8s
+def test_create_namespaced_pod_already_exists(pod_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    raw_body = yaml.safe_load(pod_yaml)
+    body = generate_pod(raw_body)
+    v1.create_namespaced_pod("default", body=body)
+    with pytest.raises(ApiException) as err:
+        v1.create_namespaced_pod("default", body=body)
+    assert err.value.status == 409
+    assert err.value.reason == "AlreadyExists"
+
+
+@mock8s
 def test_create_namespaced_pod_wrong_kind(pod_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
@@ -771,5 +797,28 @@ def test_patch_namespaced_pod_namespace_doesnt_exist(pod_yaml):
     v1.create_namespaced_pod("default", body=body)
     with pytest.raises(ApiException) as err:
         v1.patch_namespaced_pod("barbaz", "no-namespace", new_body)
+    assert err.value.status == 404
+    assert err.value.reason == "Not Found"
+
+
+@mock8s
+def test_read_namespaced_pod_log(pod_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = generate_pod(yaml.safe_load(pod_yaml))
+    v1.create_namespaced_pod("default", body=body)
+    log = v1.read_namespaced_pod_log("barbaz", "default")
+    assert isinstance(log, str) is True
+    assert log == "LOG"
+
+
+@mock8s
+def test_read_namespaced_pod_log_pod_doesnt_exist(pod_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    body = generate_pod(yaml.safe_load(pod_yaml))
+    v1.create_namespaced_pod("default", body=body)
+    with pytest.raises(ApiException) as err:
+        v1.read_namespaced_pod_log("barber", "default")
     assert err.value.status == 404
     assert err.value.reason == "Not Found"

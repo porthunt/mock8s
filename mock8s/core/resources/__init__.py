@@ -48,6 +48,9 @@ class Resources:
         if namespace not in self._namespaced_items:
             raise ApiException(404, "Not Found")
 
+        if body in self._namespaced_items[namespace]:
+            raise ApiException(409, "AlreadyExists")
+
         self._items.add(body)
         self._namespaced_items[namespace].add(body)
         return body

@@ -92,4 +92,5 @@ class MockCoreV1Api:
     # POD LOGS
 
     def read_namespaced_pod_log(self, name, namespace, **kwargs):
-        pass
+        self.read_namespaced_pod(name, namespace)
+        return "LOG"
