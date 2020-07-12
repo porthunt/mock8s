@@ -1,6 +1,6 @@
 from mock8s.core.resources import Resources
 from mock8s.client.models.mock_v1_service import MockV1Service
-from mock8s.client.models.mock_v1_service_list import MockV1ServiceList
+from kubernetes.client.models.v1_service_list import V1ServiceList
 
 
 class Services(Resources):
@@ -35,11 +35,11 @@ class Services(Resources):
                     if self._field_in_resource(service, field_selector):
                         services.append(service)
 
-        return MockV1ServiceList(items=services)
+        return V1ServiceList(items=services)
 
     def list(self, namespace: str, **kwargs):
         services = super().list(namespace, **kwargs)
-        return MockV1ServiceList(items=services)
+        return V1ServiceList(items=services)
 
     def patch(self, name: str, namespace: str, body: MockV1Service, **kwargs):
         return super().patch(name, namespace, body, **kwargs)

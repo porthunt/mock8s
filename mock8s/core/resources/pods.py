@@ -1,6 +1,6 @@
 from mock8s.core.resources import Resources
 from mock8s.client.models.mock_v1_pod import MockV1Pod
-from mock8s.client.models.mock_v1_pod_list import MockV1PodList
+from kubernetes.client.models.v1_pod_list import V1PodList
 
 
 class Pods(Resources):
@@ -15,7 +15,7 @@ class Pods(Resources):
 
     def list(self, namespace: str, **kwargs):
         pods = super().list(namespace, **kwargs)
-        return MockV1PodList(items=pods)
+        return V1PodList(items=pods)
 
     def patch(self, name: str, namespace: str, body: MockV1Pod, **kwargs):
         return super().patch(name, namespace, body, **kwargs)
