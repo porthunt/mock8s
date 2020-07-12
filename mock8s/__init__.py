@@ -12,8 +12,7 @@ def mock8s(function):
         with patch("kubernetes.client.CoreV1Api", new=MockCoreV1Api), patch(
             "kubernetes.client.models.V1Service", new=MockV1Service
         ), patch("kubernetes.client.models.V1Pod", new=MockV1Pod), patch(
-            "kubernetes.config.kube_config.load_kube_config",
-            new=mock_load_kube_config,
+            "kubernetes.config.load_kube_config", new=mock_load_kube_config,
         ):
             return f(*args, **kwargs)
 
