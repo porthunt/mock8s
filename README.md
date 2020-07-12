@@ -24,7 +24,7 @@ def delete_service(namespace):
 With this decorator, all the supported interactions with the cluster are mocked.
 
 ## Support
-Check the [wiki page]() to verify if the class/method you want to test is supported.
+Check the [wiki page](https://github.com/porthunt/mock8s/wiki) to verify if the class/method you want to test is supported.
 
 ## Install
 Since mock8s is still not available on pip, you can install it using:
