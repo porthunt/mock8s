@@ -123,7 +123,7 @@ Easily mock tests from kubernetes-client
 |`list_node`|:x:|
 |`list_persistent_volume`|:x:|
 |`list_persistent_volume_claim_for_all_namespaces`|:x:|
-|`list_pod_for_all_namespaces`|:x:|
+|`list_pod_for_all_namespaces`|:white_check_mark:|
 |`list_pod_template_for_all_namespaces`|:x:|
 |`list_replication_controller_for_all_namespaces`|:x:|
 |`list_resource_quota_for_all_namespaces`|:x:|

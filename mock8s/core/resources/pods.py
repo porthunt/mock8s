@@ -13,6 +13,10 @@ class Pods(Resources):
     def read(self, name: str, namespace: str, **kwargs):
         return super().read(name, namespace, **kwargs)
 
+    def list_all(self, **kwargs):
+        pods = super().list_all(**kwargs)
+        return V1PodList(items=pods)
+
     def list(self, namespace: str, **kwargs):
         pods = super().list(namespace, **kwargs)
         return V1PodList(items=pods)

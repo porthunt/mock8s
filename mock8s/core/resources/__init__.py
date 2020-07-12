@@ -65,6 +65,30 @@ class Resources:
         else:
             raise ApiException(404, "Not Found")
 
+    def list_all(self, **kwargs):
+        label_selector = kwargs.get("label_selector")
+        field_selector = kwargs.get("field_selector")
+
+        resources = []
+
+        if not label_selector and not field_selector:
+            resources = self._items
+        else:
+            for resource in self._items:
+                if label_selector and field_selector:
+                    if self._label_in_resource(
+                        resource, label_selector
+                    ) and self._field_in_resource(resource, field_selector):
+                        resources.append(resource)
+                elif label_selector:
+                    if self._label_in_resource(resource, label_selector):
+                        resources.append(resource)
+                elif field_selector:
+                    if self._field_in_resource(resource, field_selector):
+                        resources.append(resource)
+
+        return resources
+
     def list(self, namespace: str, **kwargs):
         if namespace not in self._namespaced_items:
             raise ApiException(404, "Not Found")

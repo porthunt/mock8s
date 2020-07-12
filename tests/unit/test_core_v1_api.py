@@ -519,6 +519,50 @@ def test_patch_namespaced_service_namespace_doesnt_exist(service_yaml):
 
 
 @mock8s
+def test_list_pod_for_all_namespaces(pod_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    raw_body = yaml.safe_load(pod_yaml)
+    body = generate_pod(raw_body)
+    assert len(v1.list_pod_for_all_namespaces().items) == 0
+    v1.create_namespaced_pod("default", body=body)
+    assert len(v1.list_pod_for_all_namespaces().items) == 1
+
+
+@mock8s
+def test_list_pod_for_all_namespaces_label_selector(pod_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    raw_body = yaml.safe_load(pod_yaml)
+    body = generate_pod(raw_body)
+    assert len(v1.list_pod_for_all_namespaces().items) == 0
+    v1.create_namespaced_pod("default", body=body)
+    assert len(v1.list_pod_for_all_namespaces().items) == 1
+    filtered = v1.list_pod_for_all_namespaces(label_selector="group=def")
+    assert len(filtered.items) == 1
+
+
+@mock8s
+def test_list_pod_for_all_namespaces_label_selector_not_found(pod_yaml):
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    raw_body = yaml.safe_load(pod_yaml)
+    body = generate_pod(raw_body)
+    assert len(v1.list_pod_for_all_namespaces().items) == 0
+    v1.create_namespaced_pod("default", body=body)
+    assert len(v1.list_pod_for_all_namespaces().items) == 1
+    filtered = v1.list_pod_for_all_namespaces(label_selector="xxx")
+    assert len(filtered.items) == 0
+
+
+@mock8s
+def test_list_pod_for_all_namespaces_empty():
+    config.load_kube_config()
+    v1 = client.CoreV1Api()
+    assert len(v1.list_pod_for_all_namespaces().items) == 0
+
+
+@mock8s
 def test_create_namespaced_pod(pod_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()

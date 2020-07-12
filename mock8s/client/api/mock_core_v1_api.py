@@ -77,6 +77,9 @@ class MockCoreV1Api:
     def read_namespaced_pod(self, name, namespace, **kwargs):
         return self.pods.read(name, namespace, **kwargs)
 
+    def list_pod_for_all_namespaces(self, **kwargs):
+        return self.pods.list_all(**kwargs)
+
     def list_namespaced_pod(self, namespace, **kwargs):
         return self.pods.list(namespace, **kwargs)
 
@@ -92,5 +95,5 @@ class MockCoreV1Api:
     # POD LOGS
 
     def read_namespaced_pod_log(self, name, namespace, **kwargs):
-        self.read_namespaced_pod(name, namespace)
+        self.read_namespaced_pod(name, namespace, **kwargs)
         return "LOG"
