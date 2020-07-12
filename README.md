@@ -1,4 +1,6 @@
 # mock8s - Mock Kubernetes
+[![Build Status](https://travis-ci.org/porthunt/mock8s.svg?branch=0.1.0)](https://travis-ci.org/porthunt/mock8s)
+
 `mock8s` is an easy way to test your kubernetes resources.
 
 ## Summary
