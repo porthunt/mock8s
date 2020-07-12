@@ -61,7 +61,7 @@ Easily mock tests from kubernetes-client
 |`create_namespaced_event`|:x:|
 |`create_namespaced_limit_range`|:x:|
 |`create_namespaced_persistent_volume_claim`|:x:|
-|`create_namespaced_pod`|:x:|
+|`create_namespaced_pod`|:white_check_mark:|
 |`create_namespaced_pod_binding`|:x:|
 |`create_namespaced_pod_eviction`|:x:|
 |`create_namespaced_pod_template`|:x:|
@@ -92,7 +92,7 @@ Easily mock tests from kubernetes-client
 |`delete_namespaced_event`|:x:|
 |`delete_namespaced_limit_range`|:x:|
 |`delete_namespaced_persistent_volume_claim`|:x:|
-|`delete_namespaced_pod`|:x:|
+|`delete_namespaced_pod`|:white_check_mark:|
 |`delete_namespaced_pod_template`|:x:|
 |`delete_namespaced_replication_controller`|:x:|
 |`delete_namespaced_resource_quota`|:x:|
@@ -113,7 +113,7 @@ Easily mock tests from kubernetes-client
 |`list_namespaced_event`|:x:|
 |`list_namespaced_limit_range`|:x:|
 |`list_namespaced_persistent_volume_claim`|:x:|
-|`list_namespaced_pod`|:x:|
+|`list_namespaced_pod`|:white_check_mark:|
 |`list_namespaced_pod_template`|:x:|
 |`list_namespaced_replication_controller`|:x:|
 |`list_namespaced_resource_quota`|:x:|
@@ -138,7 +138,7 @@ Easily mock tests from kubernetes-client
 |`patch_namespaced_limit_range`|:x:|
 |`patch_namespaced_persistent_volume_claim`|:x:|
 |`patch_namespaced_persistent_volume_claim_status`|:x:|
-|`patch_namespaced_pod`|:x:|
+|`patch_namespaced_pod`|:white_check_mark:|
 |`patch_namespaced_pod_status`|:x:|
 |`patch_namespaced_pod_template`|:x:|
 |`patch_namespaced_replication_controller`|:x:|
@@ -163,8 +163,8 @@ Easily mock tests from kubernetes-client
 |`read_namespaced_limit_range`|:x:|
 |`read_namespaced_persistent_volume_claim`|:x:|
 |`read_namespaced_persistent_volume_claim_status`|:x:|
-|`read_namespaced_pod`|:x:|
-|`read_namespaced_pod_log`|:x:|
+|`read_namespaced_pod`|:white_check_mark:|
+|`read_namespaced_pod_log`|:white_check_mark:|
 |`read_namespaced_pod_status`|:x:|
 |`read_namespaced_pod_template`|:x:|
 |`read_namespaced_replication_controller`|:x:|
@@ -189,7 +189,7 @@ Easily mock tests from kubernetes-client
 |`replace_namespaced_limit_range`|:x:|
 |`replace_namespaced_persistent_volume_claim`|:x:|
 |`replace_namespaced_persistent_volume_claim_status`|:x:|
-|`replace_namespaced_pod`|:x:|
+|`replace_namespaced_pod`|:white_check_mark:|
 |`replace_namespaced_pod_status`|:x:|
 |`replace_namespaced_pod_template`|:x:|
 |`replace_namespaced_replication_controller`|:x:|
