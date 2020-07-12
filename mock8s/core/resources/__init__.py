@@ -7,11 +7,11 @@ class Resources:
         self._items = set()
 
     @staticmethod
-    def __label_in_resource(resource, label_selector: str):
-        if resource.metadata.labels:
+    def _label_in_resource(resource, label_selector: str):
+        if resource.metadata["labels"]:
             labels = [
                 "{}={}".format(key, value)
-                for key, value in resource.metadata.labels.items()
+                for key, value in resource.metadata["labels"].items()
             ]
             for label in labels:
                 if label_selector.startswith(label):
@@ -20,7 +20,7 @@ class Resources:
         return False
 
     @staticmethod
-    def __field_in_resource(resource, field_selector: str):
+    def _field_in_resource(resource, field_selector: str):
         if not field_selector:
             return False
 
@@ -29,9 +29,9 @@ class Resources:
         ) and not field_selector.startswith("metadata.namespace"):
             raise ApiException(400, "Bad Request")
 
-        selector_name = "metadata.name={}".format(resource.metadata.name)
+        selector_name = "metadata.name={}".format(resource.metadata["name"])
         selector_namespace = "metadata.namespace={}".format(
-            resource.metadata.namespace
+            resource.metadata["namespace"]
         )
 
         if (
@@ -43,7 +43,7 @@ class Resources:
         return False
 
     def create(self, namespace: str, body, **kwargs):
-        body.metadata.add_namespace(namespace)
+        body.metadata = dict(body.metadata, **{"namespace": namespace})
 
         if namespace not in self._namespaced_items:
             raise ApiException(404, "Not Found")
@@ -57,34 +57,10 @@ class Resources:
             raise ApiException(404, "Not Found")
 
         for resource in self._namespaced_items[namespace]:
-            if resource.metadata.name == name:
+            if resource.metadata["name"] == name:
                 return resource
         else:
             raise ApiException(404, "Not Found")
-
-    def list_all(self, **kwargs):
-        label_selector = kwargs.get("label_selector")
-        field_selector = kwargs.get("field_selector")
-
-        services = []
-
-        if not label_selector and not field_selector:
-            services = self._items
-        else:
-            for service in self._items:
-                if label_selector and field_selector:
-                    if self.__label_in_resource(
-                        service, label_selector
-                    ) and self.__field_in_resource(service, field_selector):
-                        services.append(service)
-                elif label_selector:
-                    if self.__label_in_resource(service, label_selector):
-                        services.append(service)
-                elif field_selector:
-                    if self.__field_in_resource(service, field_selector):
-                        services.append(service)
-
-        return services
 
     def list(self, namespace: str, **kwargs):
         if namespace not in self._namespaced_items:
@@ -100,15 +76,15 @@ class Resources:
         else:
             for service in self._namespaced_items[namespace]:
                 if label_selector and field_selector:
-                    if self.__label_in_resource(
+                    if self._label_in_resource(
                         service, label_selector
-                    ) and self.__field_in_resource(service, field_selector):
+                    ) and self._field_in_resource(service, field_selector):
                         services.append(service)
                 elif label_selector:
-                    if self.__label_in_resource(service, label_selector):
+                    if self._label_in_resource(service, label_selector):
                         services.append(service)
                 elif field_selector:
-                    if self.__field_in_resource(service, field_selector):
+                    if self._field_in_resource(service, field_selector):
                         services.append(service)
 
         return services
@@ -118,7 +94,7 @@ class Resources:
             raise ApiException(404, "Not Found")
 
         for resource in self._namespaced_items[namespace]:
-            if resource.metadata.name == name:
+            if resource.metadata["name"] == name:
                 self._namespaced_items[namespace].remove(resource)
                 self._items.remove(resource)
                 break
@@ -143,7 +119,7 @@ class Resources:
             raise ApiException(404, "Not Found")
 
         for service in self._namespaced_items[namespace]:
-            if service.metadata.name == name:
+            if service.metadata["name"] == name:
                 self._namespaced_items[namespace].remove(service)
                 self._items.remove(service)
                 break
@@ -157,7 +133,7 @@ class Resources:
             raise ApiException(404, "Not Found")
 
         for service in self._items:
-            if service.metadata.name == name:
+            if service.metadata["name"] == name:
                 self._items.remove(service)
                 self._namespaced_items[namespace].remove(service)
                 break

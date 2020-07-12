@@ -14,7 +14,27 @@ class Services(Resources):
         return super().read(name, namespace, **kwargs)
 
     def list_all(self, **kwargs):
-        services = super().list_all(**kwargs)
+        label_selector = kwargs.get("label_selector")
+        field_selector = kwargs.get("field_selector")
+
+        services = []
+
+        if not label_selector and not field_selector:
+            services = self._items
+        else:
+            for service in self._items:
+                if label_selector and field_selector:
+                    if self._label_in_resource(
+                        service, label_selector
+                    ) and self._field_in_resource(service, field_selector):
+                        services.append(service)
+                elif label_selector:
+                    if self._label_in_resource(service, label_selector):
+                        services.append(service)
+                elif field_selector:
+                    if self._field_in_resource(service, field_selector):
+                        services.append(service)
+
         return MockV1ServiceList(items=services)
 
     def list(self, namespace: str, **kwargs):

@@ -13,10 +13,6 @@ class Pods(Resources):
     def read(self, name: str, namespace: str, **kwargs):
         return super().read(name, namespace, **kwargs)
 
-    def list_all(self, **kwargs):
-        pods = super().list_all(**kwargs)
-        return MockV1PodList(items=pods)
-
     def list(self, namespace: str, **kwargs):
         pods = super().list(namespace, **kwargs)
         return MockV1PodList(items=pods)
@@ -24,9 +20,7 @@ class Pods(Resources):
     def patch(self, name: str, namespace: str, body: MockV1Pod, **kwargs):
         return super().patch(name, namespace, body, **kwargs)
 
-    def replace(
-        self, name: str, namespace: str, body: MockV1Pod, **kwargs
-    ):
+    def replace(self, name: str, namespace: str, body: MockV1Pod, **kwargs):
         return super().replace(name, namespace, body, **kwargs)
 
     def delete(self, name: str, namespace: str, **kwargs):

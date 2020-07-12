@@ -1,20 +1,14 @@
 from kubernetes.client.rest import ApiException
 
 from mock8s.core.resources.services import Services
+from mock8s.core.resources.pods import Pods
 
 
 class MockCoreV1Api:
     def __init__(self, api_client=None):
-        if api_client is None:
-            api_client = ""
-
-        self.api_client = api_client
-
+        self.api_client = api_client if api_client else ""
         self.services = Services()
-        self._namespaced_services_items = {"default": set()}
-        self._namespaced_pods_items = {"default": set()}
-        self._services_items = set()
-        self._pods_items = set()
+        self.pods = Pods()
 
     @staticmethod
     def __label_in_resource(resource, label_selector):
@@ -52,9 +46,6 @@ class MockCoreV1Api:
 
         return False
 
-    def list_service_for_all_namespaces(self, **kwargs):
-        return self.services.list_all(**kwargs)
-
     # SERVICES
 
     def create_namespaced_service(self, namespace, body, **kwargs):
@@ -62,6 +53,9 @@ class MockCoreV1Api:
 
     def read_namespaced_service(self, name, namespace, **kwargs):
         return self.services.read(name, namespace, **kwargs)
+
+    def list_service_for_all_namespaces(self, **kwargs):
+        return self.services.list_all(**kwargs)
 
     def list_namespaced_service(self, namespace, **kwargs):
         return self.services.list(namespace, **kwargs)
@@ -84,7 +78,7 @@ class MockCoreV1Api:
         return self.pods.read(name, namespace, **kwargs)
 
     def list_namespaced_pod(self, namespace, **kwargs):
-        return self.pods.list_all(namespace, **kwargs)
+        return self.pods.list(namespace, **kwargs)
 
     def patch_namespaced_pod(self, name, namespace, body, **kwargs):
         return self.pods.patch(name, namespace, body, **kwargs)
