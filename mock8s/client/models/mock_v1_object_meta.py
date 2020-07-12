@@ -130,6 +130,10 @@ class MockV1ObjectMeta:
 
         return result
 
+    def add_namespace(self, namespace):
+        if not self.namespace:
+            self.namespace = namespace
+
     def to_str(self):
         """Returns the string representation of the model"""
         return pprint.pformat(self.to_dict())

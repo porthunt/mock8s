@@ -27,11 +27,22 @@ def service_yaml():
     """
 
 
+def generate_service(body):
+    return client.models.V1Service(
+        api_version=body.get("apiVersion"),
+        kind=body.get("kind"),
+        metadata=body.get("metadata"),
+        spec=body.get("spec"),
+        status=body.get("status", {}),
+    )
+
+
 @mock8s
 def test_list_service_for_all_namespaces(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
@@ -41,7 +52,8 @@ def test_list_service_for_all_namespaces(service_yaml):
 def test_list_service_for_all_namespaces_label_selector(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
@@ -51,10 +63,12 @@ def test_list_service_for_all_namespaces_label_selector(service_yaml):
 
 @mock8s
 def test_list_service_for_all_namespaces_label_selector_not_found(
-        service_yaml):
+    service_yaml,
+):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
@@ -66,12 +80,14 @@ def test_list_service_for_all_namespaces_label_selector_not_found(
 def test_list_service_for_all_namespaces_field_selector(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
     filtered = v1.list_service_for_all_namespaces(
-        field_selector="metadata.name=foobar")
+        field_selector="metadata.name=foobar"
+    )
     assert len(filtered.items) == 1
 
 
@@ -79,7 +95,8 @@ def test_list_service_for_all_namespaces_field_selector(service_yaml):
 def test_list_service_for_all_namespaces_label_field_selector(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
@@ -95,7 +112,8 @@ def test_list_service_for_all_namespaces_bad_label_correct_selector(
 ):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
@@ -111,7 +129,8 @@ def test_list_service_for_all_namespaces_correct_label_bad_selector(
 ):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
@@ -132,7 +151,8 @@ def test_list_service_for_all_namespaces_empty():
 def test_create_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     assert len(v1.list_service_for_all_namespaces().items) == 0
     new_service = v1.create_namespaced_service("default", body=body)
     assert new_service.metadata.name == "foobar"
@@ -156,8 +176,9 @@ def test_create_namespaced_service_wrong_kind(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     service_yaml = service_yaml.replace("kind: Service", "kind: Servii")
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
     with pytest.raises(ApiException) as err:
+        body = generate_service(raw_body)
         v1.create_namespaced_service("default", body=body)
     assert err.value.status == 400
     assert err.value.reason == "Bad Request"
@@ -167,7 +188,8 @@ def test_create_namespaced_service_wrong_kind(service_yaml):
 def test_create_namespaced_service_wrong_namespace_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     with pytest.raises(ApiException) as err:
         v1.create_namespaced_service("no-namespace", body=body)
     assert err.value.status == 404
@@ -178,7 +200,8 @@ def test_create_namespaced_service_wrong_namespace_doesnt_exist(service_yaml):
 def test_delete_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     assert len(v1.list_service_for_all_namespaces().items) == 1
     v1.delete_namespaced_service("foobar", "default")
@@ -189,7 +212,8 @@ def test_delete_namespaced_service(service_yaml):
 def test_delete_namespaced_service_name_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
         v1.delete_namespaced_service("no-service", "default")
@@ -201,7 +225,8 @@ def test_delete_namespaced_service_name_doesnt_exist(service_yaml):
 def test_delete_namespaced_service_namespace_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
         v1.delete_namespaced_service("foobar", "no-namespace")
@@ -213,7 +238,8 @@ def test_delete_namespaced_service_namespace_doesnt_exist(service_yaml):
 def test_list_namespaced_service_on_namespace(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     services = v1.list_namespaced_service("default")
     assert len(services.items) == 1
@@ -223,7 +249,8 @@ def test_list_namespaced_service_on_namespace(service_yaml):
 def test_list_namespaced_service_label_selector(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     servs = v1.list_namespaced_service("default")
     servs_filter = v1.list_namespaced_service("default", label_selector="xxx")
@@ -235,12 +262,14 @@ def test_list_namespaced_service_label_selector(service_yaml):
 def test_list_namespaced_service_label_field_selector(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     servs = v1.list_namespaced_service("default")
     servs_filter = v1.list_namespaced_service(
-        "default", label_selector="group=abc",
-        field_selector="metadata.namespace=default"
+        "default",
+        label_selector="group=abc",
+        field_selector="metadata.namespace=default",
     )
     assert len(servs.items) == 1
     assert len(servs_filter.items) == 1
@@ -252,7 +281,8 @@ def test_list_namespaced_service_bad_label_correct_field_selector(
 ):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     servs = v1.list_namespaced_service("default")
     servs_filter = v1.list_namespaced_service(
@@ -268,12 +298,13 @@ def test_list_namespaced_service_correct_label_bad_field_selector(
 ):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
-        v1.list_namespaced_service("default",
-                                   label_selector="group=abc",
-                                   field_selector="xxx")
+        v1.list_namespaced_service(
+            "default", label_selector="group=abc", field_selector="xxx"
+        )
     assert err.value.status == 400
     assert err.value.reason == "Bad Request"
 
@@ -282,7 +313,8 @@ def test_list_namespaced_service_correct_label_bad_field_selector(
 def test_list_namespaced_service_field_selector(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     servs = v1.list_namespaced_service("default")
     servs_filter = v1.list_namespaced_service(
@@ -314,7 +346,8 @@ def test_list_namespaced_service_namespace_doesnt_exist():
 def test_read_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     new_service = v1.create_namespaced_service("default", body=body)
     read_service = v1.read_namespaced_service("foobar", "default")
     assert read_service.metadata.name == "foobar"
@@ -328,7 +361,8 @@ def test_read_namespaced_service(service_yaml):
 def test_read_namespaced_service_service_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
         v1.read_namespaced_service("no-service", "default")
@@ -340,7 +374,8 @@ def test_read_namespaced_service_service_doesnt_exist(service_yaml):
 def test_read_namespaced_service_namespace_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    raw_body = yaml.safe_load(service_yaml)
+    body = generate_service(raw_body)
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
         v1.read_namespaced_service("foobar", "no-namespace")
@@ -353,8 +388,10 @@ def test_replace_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     new_service_yaml = service_yaml.replace('"group": "abc"', '"group": "def"')
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
-    new_body = yaml.load(new_service_yaml, Loader=yaml.FullLoader)
+    body = generate_service(yaml.safe_load(service_yaml))
+    new_body = generate_service(
+        yaml.safe_load(new_service_yaml)
+    )
     new_service = v1.create_namespaced_service("default", body=body)
     assert new_service.metadata.labels == {"group": "abc"}
     replaced_service = v1.replace_namespaced_service(
@@ -368,7 +405,7 @@ def test_replace_namespaced_service(service_yaml):
 def test_replace_namespaced_service_service_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    body = generate_service(yaml.safe_load(service_yaml))
     new_body = None
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
@@ -381,7 +418,7 @@ def test_replace_namespaced_service_service_doesnt_exist(service_yaml):
 def test_replace_namespaced_service_namespace_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    body = generate_service(yaml.safe_load(service_yaml))
     new_body = None
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
@@ -394,11 +431,17 @@ def test_replace_namespaced_service_namespace_doesnt_exist(service_yaml):
 def test_replace_namespaced_service_invalid_body(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    new_service_yaml = service_yaml.replace("kind: Service", "kind: Servii")
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
-    new_body = yaml.load(new_service_yaml, Loader=yaml.FullLoader)
-    v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
+        new_service_yaml = service_yaml.replace(
+            "kind: Service", "kind: Servii"
+        )
+        body = generate_service(
+            yaml.safe_load(service_yaml)
+        )
+        new_body = generate_service(
+            yaml.safe_load(new_service_yaml)
+        )
+        v1.create_namespaced_service("default", body=body)
         v1.replace_namespaced_service("foobar", "default", new_body)
     assert err.value.status == 400
     assert err.value.reason == "Bad Request"
@@ -409,22 +452,24 @@ def test_patch_namespaced_service(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
     new_service_yaml = service_yaml.replace('"group": "abc"', '"group": "def"')
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
-    new_body = yaml.load(new_service_yaml, Loader=yaml.FullLoader)
+    body = generate_service(yaml.safe_load(service_yaml))
+    new_body = generate_service(
+        yaml.safe_load(new_service_yaml)
+    )
     new_service = v1.create_namespaced_service("default", body=body)
     assert new_service.metadata.labels == {"group": "abc"}
-    replaced_service = v1.patch_namespaced_service(
+    patched_service = v1.patch_namespaced_service(
         "foobar", "default", new_body
     )
-    assert new_service == replaced_service
-    assert replaced_service.metadata.labels == {"group": "def"}
+    assert new_service == patched_service
+    assert patched_service.metadata.labels == {"group": "def"}
 
 
 @mock8s
 def test_patch_namespaced_service_service_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    body = generate_service(yaml.safe_load(service_yaml))
     new_body = None
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:
@@ -437,7 +482,7 @@ def test_patch_namespaced_service_service_doesnt_exist(service_yaml):
 def test_patch_namespaced_service_namespace_doesnt_exist(service_yaml):
     config.load_kube_config()
     v1 = client.CoreV1Api()
-    body = yaml.load(service_yaml, Loader=yaml.FullLoader)
+    body = generate_service(yaml.safe_load(service_yaml))
     new_body = None
     v1.create_namespaced_service("default", body=body)
     with pytest.raises(ApiException) as err:

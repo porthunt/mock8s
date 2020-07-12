@@ -7,7 +7,7 @@ import pprint
 import six
 
 
-class MockV1APIService(object):
+class MockV1Service(object):
 
     openapi_types = {
         "api_version": "str",
@@ -100,7 +100,7 @@ class MockV1APIService(object):
 
     def __eq__(self, other):
         """Returns true if both objects are equal"""
-        if not isinstance(other, MockV1APIService):
+        if not isinstance(other, MockV1Service):
             return False
 
         return self.__dict__ == other.__dict__
