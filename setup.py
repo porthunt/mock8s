@@ -14,6 +14,11 @@ setuptools.setup(
     url="https://github.com/porthunt/mock8s",
     packages=setuptools.find_packages(),
     license="Apache",
+    install_requires=[
+        "decorator",
+	"kubernetes",
+  	"mock"
+    ],
     test_suite="tests",
     classifiers=[
         "Programming Language :: Python :: 3",
