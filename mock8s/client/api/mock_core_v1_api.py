@@ -1,5 +1,3 @@
-from kubernetes.client.rest import ApiException
-
 from mock8s.core.resources.services import Services
 from mock8s.core.resources.pods import Pods
 
@@ -9,42 +7,6 @@ class MockCoreV1Api:
         self.api_client = api_client if api_client else ""
         self.services = Services()
         self.pods = Pods()
-
-    @staticmethod
-    def __label_in_resource(resource, label_selector):
-        if resource.metadata.labels:
-            labels = [
-                "{}={}".format(key, value)
-                for key, value in resource.metadata.labels.items()
-            ]
-            for label in labels:
-                if label_selector.startswith(label):
-                    return True
-
-        return False
-
-    @staticmethod
-    def __field_in_resource(resource, field_selector):
-        if not field_selector:
-            return False
-
-        if not field_selector.startswith(
-            "metadata.name"
-        ) and not field_selector.startswith("metadata.namespace"):
-            raise ApiException(400, "Bad Request")
-
-        selector_name = "metadata.name={}".format(resource.metadata.name)
-        selector_namespace = "metadata.namespace={}".format(
-            resource.metadata.namespace
-        )
-
-        if (
-            field_selector == selector_name
-            or field_selector == selector_namespace
-        ):
-            return True
-
-        return False
 
     # SERVICES
 

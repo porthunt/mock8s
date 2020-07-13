@@ -600,7 +600,7 @@ def test_create_namespaced_pod_already_exists(pod_yaml):
 
 
 @mock8s
-def test_create_namespaced_pod_no_body(pod_yaml):
+def test_create_namespaced_pod_no_body():
     config.load_kube_config()
     v1 = client.CoreV1Api()
     with pytest.raises(ValueError) as err:
