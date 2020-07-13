@@ -16,4 +16,4 @@ class MockV1Pod(V1Pod):
         super().__init__(api_version, kind, metadata, spec, status)
 
     def __hash__(self):
-        return hash(self.metadata["name"])
+        return hash(self.metadata.name)
