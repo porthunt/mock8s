@@ -2,7 +2,7 @@ from kubernetes.client.models.networking_v1beta1_ingress import (
     NetworkingV1beta1Ingress,
 )
 from kubernetes.client.models.networking_v1beta1_ingress_rule import (
-    NetworkingV1beta1IngressRule
+    NetworkingV1beta1IngressRule,
 )
 from kubernetes.client.rest import ApiException
 
@@ -23,9 +23,11 @@ class MockV1Ingress(NetworkingV1beta1Ingress):
 
         for rule in spec["rules"]:
             local_vars_conf = rule.get("local_vars_configuration")
-            rules.append(NetworkingV1beta1IngressRule(rule.get("host"),
-                                                      rule.get("http"),
-                                                      local_vars_conf))
+            rules.append(
+                NetworkingV1beta1IngressRule(
+                    rule.get("host"), rule.get("http"), local_vars_conf
+                )
+            )
 
         spec["rules"] = rules
         super().__init__(api_version, kind, metadata, spec, status)
