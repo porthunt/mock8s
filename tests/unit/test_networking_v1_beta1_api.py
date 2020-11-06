@@ -158,7 +158,7 @@ def test_create_namespaced_ingress(ingress_yaml):
     assert new_ingress.metadata.name == "foobar"
     assert new_ingress.metadata.namespace == "default"
     assert new_ingress.kind == "Ingress"
-    assert new_ingress.spec.rules[0]["host"] == "example.com"
+    assert new_ingress.spec.rules[0].host == "example.com"
     assert len(v1.list_ingress_for_all_namespaces().items) == 1
 
 
