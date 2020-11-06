@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mock8s",
-    version="0.1.0",
+    version="0.1.1",
     author="porthunt",
     author_email="porthunt@pm.me",
     description="mock8s is an easy way to test your kubernetes resources.",

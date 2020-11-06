@@ -22,10 +22,9 @@ class MockV1Ingress(NetworkingV1beta1Ingress):
             raise ApiException(400, "Bad Request")
 
         for rule in spec["rules"]:
-            local_vars_conf = rule.get("local_vars_configuration")
             rules.append(
                 NetworkingV1beta1IngressRule(
-                    rule.get("host"), rule.get("http"), local_vars_conf
+                    host=rule.get("host"), http=rule.get("http")
                 )
             )
 
