@@ -10,5 +10,5 @@ lint:
 unit:
 	pytest tests/
 
-test: lint unit
+test: unit
 

@@ -1,0 +1,27 @@
+name: Workflow
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run lint
+        if: ${{ always() }}
+        run: make lint
+      
+      - name: Execute tests
+        if: ${{ always() }}
+        run: make test
